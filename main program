@@ -1,0 +1,83 @@
+package edu.ccrm.cli;
+
+import edu.ccrm.config.AppConfig;
+import edu.ccrm.util.RecursiveFileUtil;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        AppConfig config = AppConfig.getInstance();
+        Scanner scanner = new Scanner(System.in);
+        int choice = 0;
+
+        System.out.println("Welcome to Campus Course & Records Manager (CCRM)");
+
+        while (choice != 9) {
+            printMenu();
+            System.out.print("Enter your choice: ");
+            try {
+                choice = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                continue; // Demonstrates 'continue' [cite: 54]
+            }
+            switch (choice) {
+                case 1:
+                    System.out.println("--> Student Management Selected");
+                    break;
+                case 2:
+                    System.out.println("--> Course Management Selected");
+                    break;
+                case 3:
+                    System.out.println("--> Enrollment & Grading Selected");
+                    break;
+                case 4:
+                    System.out.println("--> Import/Export Data Selected");
+                    break;
+                case 5:
+                    System.out.println("--> Backup & Show Backup Size Selected");
+                    showBackupSize(config.getBackupFolderPath());
+                    break;
+                case 9:
+                    System.out.println("Exiting application. Goodbye!");
+                    break; 
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+            System.out.println();
+        }
+        scanner.close();
+    }
+
+    private static void printMenu() {
+        System.out.println("=========================================");
+        System.out.println(" CCRM Main Menu");
+        System.out.println("=========================================");
+        System.out.println("1. Manage Students");
+        System.out.println("2. Manage Courses");
+        System.out.println("3. Manage Enrollment & Grades");
+        System.out.println("4. Import/Export Data");
+        System.out.println("5. Backup & Show Backup Size");
+        System.out.println("9. Exit");
+        System.out.println("=========================================");
+    }
+
+    private static void showBackupSize(String backupPathStr) {
+        Path backupPath = Paths.get(backupPathStr);
+        try {
+            if (Files.exists(backupPath) && Files.isDirectory(backupPath)) {
+                long size = RecursiveFileUtil.calculateDirectorySize(backupPath);
+                System.out.printf("Total size of backup directory '%s' is %.2f KB%n",
+                    backupPath, size / 1024.0);
+            } else {
+                System.out.println("Backup directory does not exist yet.");
+            }
+        } catch (IOException e) {
+            System.err.println("Error calculating backup size: " + e.getMessage());
+        }
+    }
+}
